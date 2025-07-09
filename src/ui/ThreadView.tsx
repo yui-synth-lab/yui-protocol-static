@@ -16,6 +16,8 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
     return new Date(timestamp).toLocaleString();
   };
 
+  const getUserAvatar = () => '🧑‍💻';
+
   return (
     <div className="flex flex-col w-full">
       {/* スレッドヘッダー */}
@@ -33,38 +35,53 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
       {/* メッセージリスト */}
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 bg-gray-950">
         {session.messages.map((message: Message) => {
-          const agent = message.agentId ? getAgentById(message.agentId) : null;
+          const agent = message.agentId ? getAgentById(message.agentId) : undefined;
           const isUser = message.role === 'user';
+          const isSystem = message.role === 'system';
+
+          // originaluiの色ロジック
+          let avatar, name, nameStyle, bubbleBorderStyle, avatarBgStyle;
+          if (isSystem) {
+            avatar = <span className="text-sm">⚙️</span>;
+            name = 'System';
+            nameStyle = { color: '#a78bfa' };
+            bubbleBorderStyle = { borderLeft: '4px solid #a78bfa' };
+            avatarBgStyle = { backgroundColor: '#a78bfa' };
+          } else if ((message.role === 'agent' || message.role === 'assistant') && agent) {
+            const color = agent.color || '#ccc';
+            avatar = agent.avatar || agent.name.charAt(0).toUpperCase();
+            name = agent.name;
+            nameStyle = { color };
+            bubbleBorderStyle = { borderLeft: `4px solid ${color}` };
+            avatarBgStyle = { backgroundColor: color };
+          } else if (isUser) {
+            avatar = getUserAvatar();
+            name = 'You';
+            nameStyle = { color: '#60a5fa' };
+            bubbleBorderStyle = { borderLeft: '4px solid #2563eb' };
+            avatarBgStyle = { backgroundColor: '#2563eb' };
+          }
+
+          // バブルの色や枠線
+          let bubbleClass = `bg-gray-800 p-4 rounded prose prose-invert prose-sm max-w-none`;
+          // アバター背景
+          let avatarClass = `w-10 h-10 rounded-full flex items-center justify-center text-2xl shadow border-2 border-gray-700`;
+
           return (
             <div
               key={message.id}
-              className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
+              className={`flex items-start space-x-3 ${isUser ? 'flex-row-reverse justify-end' : 'justify-start'}`}
             >
-              <div className={`flex items-end max-w-2xl w-full ${isUser ? 'flex-row-reverse' : ''}`}>
-                {/* Avatar */}
-                {agent && (
-                  <div className="flex flex-col items-center mr-3 ml-1">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-2xl shadow border-2 border-gray-700 bg-gray-800">
-                      {agent.avatar || agent.name.charAt(0).toUpperCase()}
-                    </div>
-                    <span className="text-xs text-gray-400 mt-1 truncate max-w-[60px]">{agent.name}</span>
-                  </div>
-                )}
-                {/* Message bubble */}
-                <div
-                  className={`rounded-xl px-5 py-4 shadow text-sm whitespace-pre-wrap break-words ${
-                    isUser
-                      ? 'bg-blue-600 text-white'
-                      : message.role === 'assistant'
-                      ? 'bg-gray-800 text-gray-100'
-                      : 'bg-yellow-700 text-yellow-100'
-                  }`}
-                  style={{ minWidth: 0 }}
-                >
-                  {message.content}
-                  <div className="text-xs text-gray-400 mt-2 text-right">
-                    {formatTimestamp(message.timestamp)}
-                  </div>
+              <div className="flex-shrink-0">
+                <div className={avatarClass} style={avatarBgStyle}>{avatar}</div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className={`flex items-center mb-2 ${isUser ? 'flex-row-reverse justify-end space-x-reverse space-x-2' : 'space-x-2'}`}> 
+                  <span className={`text-sm font-medium ${isUser ? 'text-right' : ''}`} style={nameStyle}>{name}</span>
+                  <span className={`text-xs text-gray-500 ${isUser ? 'text-right' : ''}`}>{formatTimestamp(message.timestamp)}</span>
+                </div>
+                <div className={bubbleClass} style={bubbleBorderStyle}>
+                  <div className="whitespace-pre-wrap break-words text-gray-100">{message.content}</div>
                 </div>
               </div>
             </div>

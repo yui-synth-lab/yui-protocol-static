@@ -3,11 +3,12 @@ export interface Agent {
   name: string;
   role: string;
   avatar?: string;
+  color: string;
 }
 
 export interface Message {
   id: string;
-  role: 'user' | 'assistant' | 'system';
+  role: 'user' | 'assistant' | 'system' | 'agent';
   content: string;
   timestamp: string;
   agentId?: string;
