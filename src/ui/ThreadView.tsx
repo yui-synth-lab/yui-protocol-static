@@ -167,7 +167,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
                 className="px-3 py-1 bg-green-700 hover:bg-green-800 text-white text-xs rounded border border-green-600 transition-colors"
                 title="Markdownプレビューを表示"
               >
-                🖹 プレビュー
+                🖹 Preview
               </button>
             </>
           )}

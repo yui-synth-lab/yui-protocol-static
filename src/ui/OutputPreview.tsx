@@ -36,6 +36,17 @@ const OutputPreview: React.FC<OutputPreviewProps> = ({ outputFileName }) => {
 
   return (
     <div className="max-w-2xl mx-auto p-8 bg-gray-900 rounded shadow mt-8 prose prose-invert max-w-none">
+      <button
+        onClick={() => {
+          const url = new URL(window.location.href);
+          url.searchParams.set('session', outputFileName.replace('.md', ''));
+          url.searchParams.delete('preview');
+          window.location.href = url.toString();
+        }}
+        className="mb-6 px-3 py-1 bg-gray-700 hover:bg-gray-800 text-white text-xs rounded border border-gray-500 transition-colors"
+      >
+        ← Back to Thread
+      </button>
       <h2 className="text-xl font-bold mb-4 text-gray-100">Preview: {outputFileName}</h2>
       <ReactMarkdown
         remarkPlugins={[]}
