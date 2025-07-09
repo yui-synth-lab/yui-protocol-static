@@ -58,6 +58,85 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
     }
   };
 
+  const getAgentName = (agentId: string) => {
+    const agent = session.agents.find(a => a.id === agentId);
+    return agent?.name || agentId;
+  };
+
+
+  const replaceAgentIdsWithNames = (content: string): string => {
+    if (!content) return content;
+    let replaced = content;
+    session.agents.forEach(agent => {
+      const regex = new RegExp(agent.id, 'g');
+      replaced = replaced.replace(regex, agent.name);
+    });
+    return replaced;
+  };
+
+  const renderMessageContent = (content: string) => {
+    try {
+      // Agent ID を名前に置換
+      const replacedContent = replaceAgentIdsWithNames(content);
+      // 基本的なMarkdownの安全性チェック
+      if (!replacedContent || typeof replacedContent !== 'string') {
+        return <span className="text-gray-400 italic">[Empty or invalid content]</span>;
+      }
+
+      // 安全なMarkdownのみを使用
+      return (
+        <ReactMarkdown
+          remarkPlugins={[]}
+          rehypePlugins={[]}
+          components={{
+            // 基本的なコンポーネントのみを許可
+            p: ({ children }) => <p className="mb-3 text-gray-300">{children}</p>,
+            h1: ({ children }) => <h1 className="text-2xl font-bold text-gray-100 my-4 border-b border-gray-700 pb-2">{children}</h1>,
+            h2: ({ children }) => <h2 className="text-xl font-bold text-gray-100 my-3 border-b border-gray-700 pb-1">{children}</h2>,
+            h3: ({ children }) => <h3 className="text-lg font-bold text-gray-100 my-2">{children}</h3>,
+            h4: ({ children }) => <h4 className="text-base font-bold text-gray-100 my-2">{children}</h4>,
+            h5: ({ children }) => <h5 className="text-sm font-bold text-gray-100 my-1">{children}</h5>,
+            h6: ({ children }) => <h6 className="text-xs font-bold text-gray-100 my-1">{children}</h6>,
+            strong: ({ children }) => <strong className="font-bold text-gray-100">{children}</strong>,
+            em: ({ children }) => <em className="italic text-gray-200">{children}</em>,
+            code: ({ children }) => <code className="bg-gray-700 px-1 py-0.5 text-sm text-gray-100 rounded overflow-x-auto whitespace-pre-wrap break-words">{children}</code>,
+            pre: ({ children }) => <pre className="bg-gray-900 p-4 overflow-x-auto text-sm text-gray-100 rounded mb-3 whitespace-pre-wrap break-words">{children}</pre>,
+            blockquote: ({ children }) => <blockquote className="border-l-4 border-blue-500 pl-4 py-2 my-4 bg-gray-800">{children}</blockquote>,
+            ul: ({ children }) => <ul className="list-disc list-inside space-y-1 my-4 text-gray-300">{children}</ul>,
+            ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 my-4 text-gray-300">{children}</ol>,
+            li: ({ children }) => <li className="text-gray-300">{children}</li>,
+            hr: () => <hr className="border-gray-700 my-4" />,
+            br: () => <br />,
+            // テーブル関連は無効化
+            table: () => <div className="bg-gray-800 p-4 rounded mb-3 text-gray-300">[Table content]</div>,
+            thead: () => null,
+            tbody: () => null,
+            tr: () => null,
+            th: () => null,
+            td: () => null,
+            // その他の危険な要素も無効化
+            a: () => <span className="text-blue-400">[Link]</span>,
+            img: () => <span className="text-gray-400">[Image]</span>,
+            // デフォルトの処理
+            div: ({ children }) => <div className="text-gray-300">{children}</div>,
+            span: ({ children }) => <span className="text-gray-300">{children}</span>
+          }}
+        >
+          {replacedContent}
+        </ReactMarkdown>
+      );
+    } catch (error) {
+      console.error('[MessagesView] Error rendering markdown content:', error);
+      // エラーが発生した場合はプレーンテキストとして表示
+      const replacedContent = replaceAgentIdsWithNames(content);
+      return (
+        <div className="whitespace-pre-wrap text-gray-100">
+          {replacedContent}
+        </div>
+      );
+    }
+  };
+
   return (
     <div className="flex flex-col w-full">
       {/* スレッドヘッダー */}
@@ -147,11 +226,25 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
                     <span className={`text-xs text-gray-500 ${isUser ? 'text-right' : ''}`}>{formatTimestamp(message.timestamp)}</span>
                   </div>
                   <div className={bubbleClass} style={bubbleBorderStyle}>
-                    <div className="text-gray-100">
-                      <ReactMarkdown>
-                        {message.content}
-                      </ReactMarkdown>
-                    </div>
+                  {renderMessageContent(message.content ?? '')}
+                          {/* 投票情報 */}
+                          {message.metadata?.voteFor && (
+                            <div className="mt-2 space-y-1">
+                              <div className="inline-block px-2 py-1 rounded bg-indigo-700 text-xs text-white font-semibold">
+                                投票: {getAgentName(message.metadata.voteFor)}
+                              </div>
+                              {message.metadata.voteReasoning && (
+                                <div className="text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">
+                                  <strong>理由:</strong> {message.metadata.voteReasoning}
+                                </div>
+                              )}
+                              {message.metadata.voteSection && !message.metadata.voteReasoning && (
+                                <div className="text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">
+                                  <strong>投票内容:</strong> {message.metadata.voteSection}
+                                </div>
+                              )}
+                            </div>
+                          )}
                   </div>
                 </div>
               </div>
