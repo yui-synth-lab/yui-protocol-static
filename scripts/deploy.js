@@ -57,14 +57,7 @@ try {
     }
   }
 
-  // 7. outputsフォルダをコピー
-  console.log('📁 Copying outputs folder...');
-  const outputsPath = './outputs';
-  if (fs.existsSync(outputsPath)) {
-    fs.cpSync(outputsPath, './outputs', { recursive: true });
-  }
-
-  // 8. 変更をコミット
+  // 7. 変更をコミット
   console.log('💾 Committing changes...');
   execSync('git add .', { stdio: 'inherit' });
   execSync('git commit -m "Deploy static site to GitHub Pages"', { stdio: 'inherit' });
