@@ -118,7 +118,7 @@ export function AppStaticRoutes() {
     <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
       {/* Header */}
       <header className="bg-gray-800 border-b border-gray-700">
-        <div className="flex items-center justify-between p-4 max-w-5xl mx-auto">
+        <div className="flex items-center justify-between p-4 w-full mx-auto">
           <div className="flex items-center space-x-4">
             <img src={imgUrl} alt="YUI Protocol" className="h-10 w-auto rounded shadow" />
             <h1 className="text-2xl font-bold tracking-tight">YUI Protocol</h1>
