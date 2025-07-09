@@ -7,6 +7,8 @@ import {
 // @ts-ignore
 import imgUrl from './images/YuiProtocol.png';
 import OutputPreview from './OutputPreview';
+import githubIcon from './images/github.png';
+
 
 // StaticMenu: originaluiのMenuに近いデザインで、セッション選択のみ（新規作成やエージェントタブは除外）
 const StaticMenu: React.FC<{
@@ -123,6 +125,7 @@ export function AppStaticRoutes() {
             <img src={imgUrl} alt="YUI Protocol" className="h-10 w-auto rounded shadow" />
             <h1 className="text-2xl font-bold tracking-tight">YUI Protocol</h1>
             <span className="text-xs bg-yellow-600 text-yellow-100 px-2 py-1 rounded">Static Demo</span>
+            <a href="https://github.com/yui-synth-lab/yui-protocol" target="_blank" rel="noopener noreferrer"><img src={githubIcon} alt="GitHub" className="h-6 w-auto" /></a>
           </div>
           <button
             onClick={() => setIsMenuOpen(true)}
