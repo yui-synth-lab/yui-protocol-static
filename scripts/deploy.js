@@ -33,7 +33,7 @@ try {
   console.log('🧹 Cleaning gh-pages branch...');
   const files = fs.readdirSync('.');
   for (const file of files) {
-    if (file === '.git' || file === 'node_modules' || file === 'dist-static' || file === 'sessions' || file.startsWith('.')) continue;
+    if (file === '.git' || file === 'node_modules' || file === 'dist-static' || file === 'sessions' || file === 'outputs' || file.startsWith('.')) continue;
     if (fs.statSync(file).isDirectory()) {
       fs.rmSync(file, { recursive: true, force: true });
     } else {
