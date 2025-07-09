@@ -1,5 +1,5 @@
 import React from 'react';
-import { Session, Agent } from '../types/index';
+import { Session, Agent, Message } from '../types/index';
 
 interface ThreadViewProps {
   session: Session;
@@ -17,62 +17,60 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full">
-      {/* Header */}
-      <div className="bg-gray-800 border-b border-gray-700 p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-100">{session.title}</h2>
-            <p className="text-sm text-gray-400">
-              {session.agents.length} agents • {session.messages.length} messages
-            </p>
-          </div>
-          <div className="text-xs text-gray-500">
-            Created: {formatTimestamp(session.createdAt)}
+    <div className="flex flex-col w-full">
+      {/* スレッドヘッダー */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700 bg-gray-900">
+        <div>
+          <h2 className="text-xl font-bold text-gray-100 mb-1">{session.title}</h2>
+          <div className="text-xs text-gray-400">
+            {session.agents.length} agents • {session.messages.length} messages
           </div>
         </div>
+        <div className="text-xs text-gray-500">
+          Created: {formatTimestamp(session.createdAt)}
+        </div>
       </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {session.messages.map((message) => {
+      {/* メッセージリスト */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 bg-gray-950">
+        {session.messages.map((message: Message) => {
           const agent = message.agentId ? getAgentById(message.agentId) : null;
-          
+          const isUser = message.role === 'user';
           return (
             <div
               key={message.id}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
             >
-              <div
-                className={`max-w-3xl rounded-lg p-4 ${
-                  message.role === 'user'
-                    ? 'bg-blue-600 text-white'
-                    : message.role === 'assistant'
-                    ? 'bg-gray-700 text-gray-100'
-                    : 'bg-yellow-600 text-yellow-100'
-                }`}
-              >
+              <div className={`flex items-end max-w-2xl w-full ${isUser ? 'flex-row-reverse' : ''}`}>
+                {/* Avatar */}
                 {agent && (
-                  <div className="flex items-center mb-2">
-                    <div className="w-6 h-6 bg-gray-500 rounded-full flex items-center justify-center text-xs font-medium mr-2">
-                      {agent.name.charAt(0).toUpperCase()}
+                  <div className="flex flex-col items-center mr-3 ml-1">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-2xl shadow border-2 border-gray-700 bg-gray-800">
+                      {agent.avatar || agent.name.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-sm font-medium">{agent.name}</span>
-                    <span className="text-xs opacity-75 ml-2">({agent.role})</span>
+                    <span className="text-xs text-gray-400 mt-1 truncate max-w-[60px]">{agent.name}</span>
                   </div>
                 )}
-                
-                <div className="whitespace-pre-wrap">{message.content}</div>
-                
-                <div className="text-xs opacity-75 mt-2">
-                  {formatTimestamp(message.timestamp)}
+                {/* Message bubble */}
+                <div
+                  className={`rounded-xl px-5 py-4 shadow text-sm whitespace-pre-wrap break-words ${
+                    isUser
+                      ? 'bg-blue-600 text-white'
+                      : message.role === 'assistant'
+                      ? 'bg-gray-800 text-gray-100'
+                      : 'bg-yellow-700 text-yellow-100'
+                  }`}
+                  style={{ minWidth: 0 }}
+                >
+                  {message.content}
+                  <div className="text-xs text-gray-400 mt-2 text-right">
+                    {formatTimestamp(message.timestamp)}
+                  </div>
                 </div>
               </div>
             </div>
           );
         })}
       </div>
-
       {/* Read-only indicator */}
       {isReadOnly && (
         <div className="bg-yellow-900 border-t border-yellow-700 p-3">

@@ -3,38 +3,11 @@ import ThreadView from './ThreadView';
 import { Session, Agent } from '../types/index';
 import {
   BrowserRouter as Router,
-  Routes,
-  Route,
-  useParams,
-  useNavigate,
-  useLocation
 } from 'react-router-dom';
+// @ts-ignore
+import imgUrl from './images/YuiProtocol.png';
 
-// 静的データ用のインターフェース
-interface StaticData {
-  sessions: Session[];
-  outputs: { [key: string]: string };
-}
-
-// 静的データを読み込む関数
-const loadStaticData = async (): Promise<StaticData> => {
-  try {
-    // セッションデータを読み込み
-    const sessionResponse = await fetch('/yui-protocol-static/data/sessions.json');
-    const sessions = await sessionResponse.json();
-    
-    // 出力データを読み込み
-    const outputsResponse = await fetch('/yui-protocol-static/data/outputs.json');
-    const outputs = await outputsResponse.json();
-    
-    return { sessions, outputs };
-  } catch (error) {
-    console.error('Failed to load static data:', error);
-    return { sessions: [], outputs: {} };
-  }
-};
-
-// 静的サイト用のメニューコンポーネント
+// StaticMenu: originaluiのMenuに近いデザインで、セッション選択のみ（新規作成やエージェントタブは除外）
 const StaticMenu: React.FC<{
   sessions: Session[];
   currentSession: Session | null;
@@ -43,18 +16,13 @@ const StaticMenu: React.FC<{
   onClose: () => void;
 }> = ({ sessions, currentSession, onSelectSession, isOpen, onClose }) => {
   if (!isOpen) return null;
-
   return (
     <>
-      <div 
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
-        onClick={onClose}
-      />
-      
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose} />
       <div className="fixed inset-0 w-full h-full bg-gray-800 border-l border-gray-700 z-50 overflow-hidden">
         <div className="p-4 h-full flex flex-col">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-100">Static Sessions</h2>
+            <h2 className="text-lg font-semibold text-gray-100">Sessions</h2>
             <button
               onClick={onClose}
               className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded"
@@ -64,20 +32,14 @@ const StaticMenu: React.FC<{
               </svg>
             </button>
           </div>
-
           <div className="flex-1 min-h-0 overflow-y-auto">
             <div className="space-y-2">
               {sessions.length === 0 ? (
                 <p className="text-xs text-gray-400 text-center py-4">No sessions available.</p>
               ) : (
                 sessions.map((session) => {
-                  const messageCount = session.messages && Array.isArray(session.messages) 
-                    ? session.messages.length 
-                    : 0;
-                  const agentCount = session.agents && Array.isArray(session.agents) 
-                    ? session.agents.length 
-                    : 0;
-                  
+                  const messageCount = session.messages?.length || 0;
+                  const agentCount = session.agents?.length || 0;
                   return (
                     <button
                       key={session.id}
@@ -114,40 +76,29 @@ const StaticMenu: React.FC<{
   );
 };
 
-// 静的サイト用のルートコンポーネント
 export function AppStaticRoutes() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentSession, setCurrentSession] = useState<Session | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await loadStaticData();
-      setSessions(data.sessions);
-      
-      // URLパラメータからセッションIDを取得
-      const urlParams = new URLSearchParams(window.location.search);
-      const sessionId = urlParams.get('session');
-      if (sessionId) {
-        const session = data.sessions.find(s => s.id === sessionId);
-        if (session) {
-          setCurrentSession(session);
+      try {
+        const sessionResponse = await fetch('/yui-protocol-static/data/sessions.json');
+        const sessions = await sessionResponse.json();
+        setSessions(sessions);
+        // URLパラメータからセッションIDを取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session');
+        if (sessionId) {
+          const session = sessions.find((s: Session) => s.id === sessionId);
+          if (session) setCurrentSession(session);
         }
+      } catch (e) {
+        setSessions([]);
       }
     };
-
     loadData();
-  }, []);
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
   const selectSession = (session: Session) => {
@@ -159,20 +110,15 @@ export function AppStaticRoutes() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100">
+    <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
       {/* Header */}
       <header className="bg-gray-800 border-b border-gray-700">
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between p-4 max-w-5xl mx-auto">
           <div className="flex items-center space-x-4">
-            <div className="h-8 w-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold">
-              Y
-            </div>
-            <h1 className="text-xl font-bold">YUI Protocol</h1>
-            <span className="text-xs bg-yellow-600 text-yellow-100 px-2 py-1 rounded">
-              Static Demo
-            </span>
+            <img src={imgUrl} alt="YUI Protocol" className="h-10 w-auto rounded shadow" />
+            <h1 className="text-2xl font-bold tracking-tight">YUI Protocol</h1>
+            <span className="text-xs bg-yellow-600 text-yellow-100 px-2 py-1 rounded">Static Demo</span>
           </div>
-          
           <button
             onClick={() => setIsMenuOpen(true)}
             className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded"
@@ -183,13 +129,12 @@ export function AppStaticRoutes() {
           </button>
         </div>
       </header>
-
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 max-w-5xl mx-auto w-full">
         {currentSession ? (
           <ThreadView
             session={currentSession}
-            onSessionUpdate={() => {}} // 静的サイトでは更新不可
+            onSessionUpdate={() => {}}
             isReadOnly={true}
           />
         ) : (
@@ -197,7 +142,7 @@ export function AppStaticRoutes() {
             <div className="text-center">
               <h2 className="text-2xl font-bold mb-4">Welcome to YUI Protocol</h2>
               <p className="text-gray-400 mb-6">
-                This is a static demonstration of the YUI Protocol system.
+                This is a static demonstration of the YUI Protocol system.<br />
                 Select a session from the menu to view the conversation.
               </p>
               <button
@@ -210,7 +155,6 @@ export function AppStaticRoutes() {
           </div>
         )}
       </main>
-
       {/* Menu */}
       <StaticMenu
         sessions={sessions}
