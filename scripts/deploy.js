@@ -69,18 +69,6 @@ try {
   execSync('git add .', { stdio: 'inherit' });
   execSync('git commit -m "Deploy static site to GitHub Pages"', { stdio: 'inherit' });
 
-  // 9. gh-pagesブランチをプッシュ（自動pushはしない）
-  console.log('🚦 Push is skipped. Please review and push manually: git push origin gh-pages');
-
-  // 10. 元のブランチに戻る
-  console.log(`🔄 Switching back to ${currentBranch}...`);
-  execSync(`git checkout ${currentBranch}`, { stdio: 'inherit' });
-
-  console.log('✅ Deployment completed (push skipped).');
-  console.log('🌐 Your site will be available at: https://[your-username].github.io/yui-protocol-static/');
-  console.log('📝 Don\'t forget to configure GitHub Pages in your repository settings:');
-  console.log('   Settings > Pages > Source: Deploy from a branch > Branch: gh-pages > Folder: / (root)');
-
 } catch (error) {
   console.error('❌ Deployment failed:', error.message);
   process.exit(1);
