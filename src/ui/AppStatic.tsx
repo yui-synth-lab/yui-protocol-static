@@ -135,7 +135,7 @@ export function AppStaticRoutes() {
         </div>
       </header>
       {/* Main Content */}
-      <main className="flex-1 max-w-5xl mx-auto w-full">
+      <main className="flex-1 mx-auto w-full">
         {isPreview && currentSession && currentSession.outputFileName ? (
           <OutputPreview outputFileName={currentSession.outputFileName} sessionId={currentSession.id} />
         ) : currentSession ? (
