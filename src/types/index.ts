@@ -12,6 +12,8 @@ export interface Message {
   content: string;
   timestamp: string;
   agentId?: string;
+  stage?: string;
+  metadata?: any;
 }
 
 export interface Session {

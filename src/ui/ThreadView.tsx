@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import { Session, Agent, Message } from '../types/index';
 
 interface ThreadViewProps {
@@ -34,59 +35,80 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
       </div>
       {/* メッセージリスト */}
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 bg-gray-950">
-        {session.messages.map((message: Message) => {
-          const agent = message.agentId ? getAgentById(message.agentId) : undefined;
-          const isUser = message.role === 'user';
-          const isSystem = message.role === 'system';
-
-          // originaluiの色ロジック
-          let avatar, name, nameStyle, bubbleBorderStyle, avatarBgStyle;
-          if (isSystem) {
-            avatar = <span className="text-sm">⚙️</span>;
-            name = 'System';
-            nameStyle = { color: '#a78bfa' };
-            bubbleBorderStyle = { borderLeft: '4px solid #a78bfa' };
-            avatarBgStyle = { backgroundColor: '#a78bfa' };
-          } else if ((message.role === 'agent' || message.role === 'assistant') && agent) {
-            const color = agent.color || '#ccc';
-            avatar = agent.avatar || agent.name.charAt(0).toUpperCase();
-            name = agent.name;
-            nameStyle = { color };
-            bubbleBorderStyle = { borderLeft: `4px solid ${color}` };
-            avatarBgStyle = { backgroundColor: color };
-          } else if (isUser) {
-            avatar = getUserAvatar();
-            name = 'You';
-            nameStyle = { color: '#60a5fa' };
-            bubbleBorderStyle = { borderLeft: '4px solid #2563eb' };
-            avatarBgStyle = { backgroundColor: '#2563eb' };
-          }
-
-          // バブルの色や枠線
-          let bubbleClass = `bg-gray-800 p-4 rounded prose prose-invert prose-sm max-w-none`;
-          // アバター背景
-          let avatarClass = `w-10 h-10 rounded-full flex items-center justify-center text-2xl shadow border-2 border-gray-700`;
-
-          return (
-            <div
-              key={message.id}
-              className={`flex items-start space-x-3 ${isUser ? 'flex-row-reverse justify-end' : 'justify-start'}`}
-            >
-              <div className="flex-shrink-0">
-                <div className={avatarClass} style={avatarBgStyle}>{avatar}</div>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className={`flex items-center mb-2 ${isUser ? 'flex-row-reverse justify-end space-x-reverse space-x-2' : 'space-x-2'}`}> 
-                  <span className={`text-sm font-medium ${isUser ? 'text-right' : ''}`} style={nameStyle}>{name}</span>
-                  <span className={`text-xs text-gray-500 ${isUser ? 'text-right' : ''}`}>{formatTimestamp(message.timestamp)}</span>
+        {(() => {
+          let prevStage: string | undefined = undefined;
+          const elements: React.ReactNode[] = [];
+          session.messages.forEach((message: Message, idx: number) => {
+            const currentStage = message.metadata?.stage;
+            if (currentStage && currentStage !== prevStage) {
+              elements.push(
+                <div key={`stage-separator-${idx}`} className="flex items-center justify-center my-4">
+                  <span className="px-3 py-1 bg-gray-700 text-gray-200 text-xs rounded-full border border-gray-600">
+                    --- Stage: {currentStage} ---
+                  </span>
                 </div>
-                <div className={bubbleClass} style={bubbleBorderStyle}>
-                  <div className="whitespace-pre-wrap break-words text-gray-100">{message.content}</div>
+              );
+            }
+            prevStage = currentStage;
+
+            const agent = message.agentId ? getAgentById(message.agentId) : undefined;
+            const isUser = message.role === 'user';
+            const isSystem = message.role === 'system';
+
+            // originaluiの色ロジック
+            let avatar, name, nameStyle, bubbleBorderStyle, avatarBgStyle;
+            if (isSystem) {
+              avatar = <span className="text-sm">⚙️</span>;
+              name = 'System';
+              nameStyle = { color: '#a78bfa' };
+              bubbleBorderStyle = { borderLeft: '4px solid #a78bfa' };
+              avatarBgStyle = { backgroundColor: '#a78bfa' };
+            } else if ((message.role === 'agent' || message.role === 'assistant') && agent) {
+              const color = agent.color || '#ccc';
+              avatar = agent.avatar || agent.name.charAt(0).toUpperCase();
+              name = agent.name;
+              nameStyle = { color };
+              bubbleBorderStyle = { borderLeft: `4px solid ${color}` };
+              avatarBgStyle = { backgroundColor: color };
+            } else if (isUser) {
+              avatar = getUserAvatar();
+              name = 'You';
+              nameStyle = { color: '#60a5fa' };
+              bubbleBorderStyle = { borderLeft: '4px solid #2563eb' };
+              avatarBgStyle = { backgroundColor: '#2563eb' };
+            }
+
+            // バブルの色や枠線
+            let bubbleClass = `bg-gray-800 p-4 rounded prose prose-invert prose-sm max-w-none`;
+            // アバター背景
+            let avatarClass = `w-10 h-10 rounded-full flex items-center justify-center text-2xl shadow border-2 border-gray-700`;
+
+            elements.push(
+              <div
+                key={message.id}
+                className={`flex items-start space-x-3 ${isUser ? 'flex-row-reverse justify-end' : 'justify-start'}`}
+              >
+                <div className="flex-shrink-0">
+                  <div className={avatarClass} style={avatarBgStyle}>{avatar}</div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className={`flex items-center mb-2 ${isUser ? 'flex-row-reverse justify-end space-x-reverse space-x-2' : 'space-x-2'}`}> 
+                    <span className={`text-sm font-medium ${isUser ? 'text-right' : ''}`} style={nameStyle}>{name}</span>
+                    <span className={`text-xs text-gray-500 ${isUser ? 'text-right' : ''}`}>{formatTimestamp(message.timestamp)}</span>
+                  </div>
+                  <div className={bubbleClass} style={bubbleBorderStyle}>
+                    <div className="text-gray-100">
+                      <ReactMarkdown>
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          });
+          return elements;
+        })()}
       </div>
       {/* Read-only indicator */}
       {isReadOnly && (
