@@ -24,7 +24,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
     
     try {
       // outputs.jsonからファイル内容を取得
-      const response = await fetch('/data/outputs.json');
+      const response = await fetch('/yui-protocol-static/data/outputs.json');
       if (!response.ok) {
         throw new Error('outputs.json not found');
       }
