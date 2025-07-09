@@ -137,7 +137,7 @@ export function AppStaticRoutes() {
       {/* Main Content */}
       <main className="flex-1 max-w-5xl mx-auto w-full">
         {isPreview && currentSession && currentSession.outputFileName ? (
-          <OutputPreview outputFileName={currentSession.outputFileName} />
+          <OutputPreview outputFileName={currentSession.outputFileName} sessionId={currentSession.id} />
         ) : currentSession ? (
           <ThreadView
             session={currentSession}

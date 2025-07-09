@@ -3,9 +3,10 @@ import ReactMarkdown from 'react-markdown';
 
 interface OutputPreviewProps {
   outputFileName: string;
+  sessionId: string;
 }
 
-const OutputPreview: React.FC<OutputPreviewProps> = ({ outputFileName }) => {
+const OutputPreview: React.FC<OutputPreviewProps> = ({ outputFileName, sessionId }) => {
   const [content, setContent] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -39,7 +40,7 @@ const OutputPreview: React.FC<OutputPreviewProps> = ({ outputFileName }) => {
       <button
         onClick={() => {
           const url = new URL(window.location.href);
-          url.searchParams.set('session', outputFileName.replace('.md', ''));
+          url.searchParams.set('session', sessionId);
           url.searchParams.delete('preview');
           window.location.href = url.toString();
         }}
