@@ -149,13 +149,27 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
         </div>
         <div className="flex items-center space-x-4">
           {session.outputFileName && (
-            <button
-              onClick={handleDownloadOutput}
-              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded border border-blue-500 transition-colors"
-              title={`Download ${session.outputFileName}`}
-            >
-              📄 Download Output
-            </button>
+            <>
+              <button
+                onClick={handleDownloadOutput}
+                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded border border-blue-500 transition-colors"
+                title={`Download ${session.outputFileName}`}
+              >
+                📄 Download Output
+              </button>
+              <button
+                onClick={() => {
+                  const url = new URL(window.location.href);
+                  url.searchParams.set('session', session.id);
+                  url.searchParams.set('preview', '');
+                  window.location.href = url.toString();
+                }}
+                className="px-3 py-1 bg-green-700 hover:bg-green-800 text-white text-xs rounded border border-green-600 transition-colors"
+                title="Markdownプレビューを表示"
+              >
+                🖹 プレビュー
+              </button>
+            </>
           )}
           <div className="text-xs text-gray-500">
             Created: {formatTimestamp(session.createdAt)}

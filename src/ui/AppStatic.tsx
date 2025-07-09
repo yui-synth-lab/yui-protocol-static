@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom';
 // @ts-ignore
 import imgUrl from './images/YuiProtocol.png';
+import OutputPreview from './OutputPreview';
 
 // StaticMenu: originaluiのMenuに近いデザインで、セッション選択のみ（新規作成やエージェントタブは除外）
 const StaticMenu: React.FC<{
@@ -87,7 +88,7 @@ export function AppStaticRoutes() {
         const sessionResponse = await fetch('/yui-protocol-static/data/sessions.json');
         const sessions = await sessionResponse.json();
         setSessions(sessions);
-        // URLパラメータからセッションIDを取得
+        // URLパラメータからセッションIDとプレビュー有無を取得
         const urlParams = new URLSearchParams(window.location.search);
         const sessionId = urlParams.get('session');
         if (sessionId) {
@@ -100,6 +101,10 @@ export function AppStaticRoutes() {
     };
     loadData();
   }, []);
+
+  // プレビューモード判定
+  const urlParams = new URLSearchParams(window.location.search);
+  const isPreview = urlParams.has('preview');
 
   const selectSession = (session: Session) => {
     setCurrentSession(session);
@@ -131,7 +136,9 @@ export function AppStaticRoutes() {
       </header>
       {/* Main Content */}
       <main className="flex-1 max-w-5xl mx-auto w-full">
-        {currentSession ? (
+        {isPreview && currentSession && currentSession.outputFileName ? (
+          <OutputPreview outputFileName={currentSession.outputFileName} />
+        ) : currentSession ? (
           <ThreadView
             session={currentSession}
             onSessionUpdate={() => {}}
