@@ -4,7 +4,7 @@ import path from 'path';
 // sessionsディレクトリからJSONファイルを読み込んでマージ
 const sessionsDir = './sessions';
 const outputsDir = './outputs';
-const dataDir = './outputs/data';
+const dataDir = './public/data';
 
 // データディレクトリを作成
 if (!fs.existsSync(dataDir)) {

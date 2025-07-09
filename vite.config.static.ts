@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   base: '/yui-protocol-static/',
-  publicDir: 'outputs',
+  publicDir: 'public',
   build: {
     emptyOutDir: true,
     outDir: 'dist-static',
