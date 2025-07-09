@@ -84,7 +84,7 @@ export function AppStaticRoutes() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const sessionResponse = await fetch('/yui-protocol-static/data/sessions.json');
+        const sessionResponse = await fetch('/yui-protocol-static/outputs/data/sessions.json');
         const sessions = await sessionResponse.json();
         setSessions(sessions);
         // URLパラメータからセッションIDを取得
