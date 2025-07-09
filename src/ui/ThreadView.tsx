@@ -23,12 +23,27 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
     if (!session.outputFileName) return;
     
     try {
-      const response = await fetch(`/outputs/${session.outputFileName}`);
+      // outputs.jsonからファイル内容を取得
+      const response = await fetch('/data/outputs.json');
       if (!response.ok) {
-        throw new Error('File not found');
+        throw new Error('outputs.json not found');
       }
       
-      const blob = await response.blob();
+      const outputsData = await response.json();
+      const fileContent = outputsData[session.outputFileName];
+      
+      if (!fileContent) {
+        throw new Error('File content not found in outputs.json');
+      }
+      
+      // ファイル名から拡張子を取得
+      const extension = session.outputFileName.split('.').pop() || 'txt';
+      const mimeType = extension === 'md' ? 'text/markdown' : 
+                      extension === 'json' ? 'application/json' : 
+                      'text/plain';
+      
+      // Blobを作成してダウンロード
+      const blob = new Blob([fileContent], { type: mimeType });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
