@@ -30,7 +30,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
       }
       
       const outputsData = await response.json();
-      const fileContent = outputsData[session.outputFileName];
+      const fileContent = outputsData[session.outputFileName.replace('.md', '')];
       
       if (!fileContent) {
         throw new Error('File content not found in outputs.json');
