@@ -29,11 +29,11 @@ try {
     execSync('git checkout gh-pages', { stdio: 'inherit' });
   }
 
-  // 5. 既存のファイルを削除（.git, node_modules, .で始まるファイル/ディレクトリは除外）
+  // 5. 既存のファイルを削除（.git, node_modules, dist-static, sessions, outputs, .で始まるファイル/ディレクトリは除外）
   console.log('🧹 Cleaning gh-pages branch...');
   const files = fs.readdirSync('.');
   for (const file of files) {
-    if (file === '.git' || file === 'node_modules' || file.startsWith('.')) continue;
+    if (file === '.git' || file === 'node_modules' || file === 'dist-static' || file === 'sessions' || file === 'outputs' || file.startsWith('.')) continue;
     if (fs.statSync(file).isDirectory()) {
       fs.rmSync(file, { recursive: true, force: true });
     } else {
