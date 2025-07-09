@@ -23,4 +23,5 @@ export interface Session {
   agents: Agent[];
   createdAt: string;
   updatedAt: string;
+  outputFileName?: string;
 } 

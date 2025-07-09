@@ -29,11 +29,11 @@ try {
     execSync('git checkout gh-pages', { stdio: 'inherit' });
   }
 
-  // 5. 既存のファイルを削除（.git, node_modules, dist-static, sessions, outputs, .で始まるファイル/ディレクトリは除外）
+  // 5. 既存のファイルを削除（.git, node_modules, dist-static, sessions, .で始まるファイル/ディレクトリは除外）
   console.log('🧹 Cleaning gh-pages branch...');
   const files = fs.readdirSync('.');
   for (const file of files) {
-    if (file === '.git' || file === 'node_modules' || file === 'dist-static' || file === 'sessions' || file === 'outputs' || file.startsWith('.')) continue;
+    if (file === '.git' || file === 'node_modules' || file === 'dist-static' || file === 'sessions' || file.startsWith('.')) continue;
     if (fs.statSync(file).isDirectory()) {
       fs.rmSync(file, { recursive: true, force: true });
     } else {
@@ -57,15 +57,22 @@ try {
     }
   }
 
-  // 7. 変更をコミット
+  // 7. outputsフォルダをコピー
+  console.log('📁 Copying outputs folder...');
+  const outputsPath = './outputs';
+  if (fs.existsSync(outputsPath)) {
+    fs.cpSync(outputsPath, './outputs', { recursive: true });
+  }
+
+  // 8. 変更をコミット
   console.log('💾 Committing changes...');
   execSync('git add .', { stdio: 'inherit' });
   execSync('git commit -m "Deploy static site to GitHub Pages"', { stdio: 'inherit' });
 
-  // 8. gh-pagesブランチをプッシュ（自動pushはしない）
+  // 9. gh-pagesブランチをプッシュ（自動pushはしない）
   console.log('🚦 Push is skipped. Please review and push manually: git push origin gh-pages');
 
-  // 9. 元のブランチに戻る
+  // 10. 元のブランチに戻る
   console.log(`🔄 Switching back to ${currentBranch}...`);
   execSync(`git checkout ${currentBranch}`, { stdio: 'inherit' });
 

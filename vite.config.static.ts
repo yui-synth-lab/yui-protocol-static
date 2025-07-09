@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   base: '/yui-protocol-static/',
+  publicDir: 'outputs',
   build: {
     emptyOutDir: true,
     outDir: 'dist-static',
@@ -14,10 +15,5 @@ export default defineConfig({
         assetFileNames: 'assets/[name][extname]'
       }
     }
-  },
-  test: {
-    environment: 'jsdom',
-    globals: true,
-    setupFiles: './tests/setup.ts',
   },
 }); 

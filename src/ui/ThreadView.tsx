@@ -19,6 +19,30 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
 
   const getUserAvatar = () => '🧑‍💻';
 
+  const handleDownloadOutput = async () => {
+    if (!session.outputFileName) return;
+    
+    try {
+      const response = await fetch(`/outputs/${session.outputFileName}`);
+      if (!response.ok) {
+        throw new Error('File not found');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = session.outputFileName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('ダウンロードに失敗しました。ファイルが見つからない可能性があります。');
+    }
+  };
+
   return (
     <div className="flex flex-col w-full">
       {/* スレッドヘッダー */}
@@ -29,8 +53,19 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
             {session.agents.length} agents • {session.messages.length} messages
           </div>
         </div>
-        <div className="text-xs text-gray-500">
-          Created: {formatTimestamp(session.createdAt)}
+        <div className="flex items-center space-x-4">
+          {session.outputFileName && (
+            <button
+              onClick={handleDownloadOutput}
+              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded border border-blue-500 transition-colors"
+              title={`Download ${session.outputFileName}`}
+            >
+              📄 Download Output
+            </button>
+          )}
+          <div className="text-xs text-gray-500">
+            Created: {formatTimestamp(session.createdAt)}
+          </div>
         </div>
       </div>
       {/* メッセージリスト */}
