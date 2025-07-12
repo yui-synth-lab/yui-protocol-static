@@ -63,6 +63,29 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
     return agent?.name || agentId;
   };
 
+  const getStageColor = (stage: string): string => {
+    const colors: { [key: string]: string } = {
+      'individual-thought': 'bg-blue-900 border border-blue-700',
+      'mutual-reflection': 'bg-green-900 border border-green-700',
+      'conflict-resolution': 'bg-yellow-900 border border-yellow-700',
+      'synthesis-attempt': 'bg-purple-900 border border-purple-700',
+      'output-generation': 'bg-indigo-900 border border-indigo-700',
+      'finalize': 'bg-gray-800 border border-gray-600'
+    };
+    return colors[stage] || 'bg-gray-800 border border-gray-600';
+  };
+
+  const getStageLabel = (stage: string): string => {
+    const labels: { [key: string]: string } = {
+      'individual-thought': 'Individual Thought',
+      'mutual-reflection': 'Mutual Reflection',
+      'conflict-resolution': 'Conflict Resolution',
+      'synthesis-attempt': 'Synthesis Attempt',
+      'output-generation': 'Output Generation',
+      'finalize': 'Finalize'
+    };
+    return labels[stage] || stage;
+  };
 
   const replaceAgentIdsWithNames = (content: string): string => {
     if (!content) return content;
@@ -138,7 +161,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
   };
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full max-w-4xl mx-auto bg-gray-950 rounded-lg shadow-lg h-full overflow-hidden">
       {/* スレッドヘッダー */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700 bg-gray-900">
         <div>
@@ -182,13 +205,14 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
           let prevStage: string | undefined = undefined;
           const elements: React.ReactNode[] = [];
           session.messages.forEach((message: Message, idx: number) => {
-            const currentStage = message.metadata?.stage;
+            const currentStage = message.stage;
+
             if (currentStage && currentStage !== prevStage) {
               elements.push(
-                <div key={`stage-separator-${idx}`} className="flex items-center justify-center my-4">
-                  <span className="px-3 py-1 bg-gray-700 text-gray-200 text-xs rounded-full border border-gray-600">
-                    --- Stage: {currentStage} ---
-                  </span>
+                <div key={`stage-separator-${idx}`} className="my-4">
+                  <div className={`p-3 ${getStageColor(currentStage)} rounded`}>
+                    <h3 className="font-medium text-gray-200">{getStageLabel(currentStage)}</h3>
+                  </div>
                 </div>
               );
             }
@@ -222,7 +246,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
             }
 
             // バブルの色や枠線
-            let bubbleClass = `bg-gray-800 p-4 rounded prose prose-invert prose-sm max-w-none`;
+            let bubbleClass = `bg-gray-800 p-4 rounded prose prose-invert max-w-none text-sm`;
             // アバター背景
             let avatarClass = `w-10 h-10 rounded-full flex items-center justify-center text-2xl shadow border-2 border-gray-700`;
 

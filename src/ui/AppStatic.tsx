@@ -50,11 +50,10 @@ const StaticMenu: React.FC<{
                         onSelectSession(session);
                         onClose();
                       }}
-                      className={`w-full text-left p-3 transition-colors rounded ${
-                        currentSession?.id === session.id
-                          ? 'bg-blue-950 border border-blue-800'
-                          : 'hover:bg-gray-700'
-                      }`}
+                      className={`w-full text-left p-3 transition-colors rounded ${currentSession?.id === session.id
+                        ? 'bg-blue-950 border border-blue-800'
+                        : 'hover:bg-gray-700'
+                        }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
@@ -120,31 +119,69 @@ export function AppStaticRoutes() {
     <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
       {/* Header */}
       <header className="bg-gray-800 border-b border-gray-700">
-        <div className="flex items-center justify-between p-4 w-full mx-auto">
-          <div className="flex items-center space-x-4">
-            <img src={imgUrl} alt="YUI Protocol" className="h-10 w-auto rounded shadow" />
-            <h1 className="text-2xl font-bold tracking-tight">YUI Protocol</h1>
-            <span className="text-xs bg-yellow-600 text-yellow-100 px-2 py-1 rounded">Static Demo</span>
-            <a href="https://github.com/yui-synth-lab/yui-protocol" target="_blank" rel="noopener noreferrer"><img src={githubIcon} alt="GitHub" className="h-6 w-auto" /></a>
+        <div className="flex flex-col items-center w-full max-w-4xl mx-auto px-2 pt-4 pb-2">
+          <div className="flex items-center w-full justify-between">
+            <div className="flex items-center space-x-4">
+              <img src={imgUrl} alt="Yui Protocol" className="h-10 w-auto rounded shadow" />
+              <h1 className="text-2xl font-bold tracking-tight">Yui Protocol</h1>
+              <span className="text-xs bg-yellow-600 text-yellow-100 px-2 py-1 rounded">Static Demo</span>
+              <a href="https://github.com/yui-synth-lab/yui-protocol" target="_blank" rel="noopener noreferrer"><img src={githubIcon} alt="GitHub" className="h-6 w-auto" /></a>
+            </div>
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
           </div>
-          <button
-            onClick={() => setIsMenuOpen(true)}
-            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+          <div className="w-full text-center text-xs text-gray-400 mt-1 mb-2">
+            Multi-AI Collaborative Reasoning through Structured Dialogue
+          </div>
+          <div className="bg-blue-900 border border-blue-700">
+            <div className="px-2 pb-2">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-1 text-xs">
+                <div className="bg-blue-800 p-1 text-blue-100">
+                  <strong>1. Individual Thought</strong><br />
+                  <span className="hidden sm:inline">Agents think independently</span>
+                  <span className="sm:hidden">Independent thinking</span>
+                </div>
+                <div className="bg-green-800 p-1 text-green-100">
+                  <strong>2. Mutual Reflection</strong><br />
+                  <span className="hidden sm:inline">Agents read and react to others</span>
+                  <span className="sm:hidden">Read & react</span>
+                </div>
+                <div className="bg-yellow-800 p-1 text-yellow-100">
+                  <strong>3. Conflict Resolution</strong><br />
+                  <span className="hidden sm:inline">Highlight divergence and debate</span>
+                  <span className="sm:hidden">Resolve conflicts</span>
+                </div>
+                <div className="bg-purple-800 p-1 text-purple-100">
+                  <strong>4. Synthesis Attempt</strong><br />
+                  <span className="hidden sm:inline">Try to unify perspectives</span>
+                  <span className="sm:hidden">Unify views</span>
+                </div>
+                <div className="bg-indigo-800 p-1 text-indigo-100">
+                  <strong>5. Output Generation</strong><br />
+                  <span className="hidden sm:inline">Final response with reasoning traces</span>
+                  <span className="sm:hidden">Final output</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
       </header>
+
       {/* Main Content */}
-      <main className="flex-1 mx-auto w-full">
+      <main className="flex-1 mx-auto w-full max-w-4xl px-2">
         {isPreview && currentSession && currentSession.outputFileName ? (
           <OutputPreview outputFileName={currentSession.outputFileName} sessionId={currentSession.id} />
         ) : currentSession ? (
           <ThreadView
             session={currentSession}
-            onSessionUpdate={() => {}}
+            onSessionUpdate={() => { }}
             isReadOnly={true}
           />
         ) : (
