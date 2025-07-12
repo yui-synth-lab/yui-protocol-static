@@ -141,31 +141,31 @@ export function AppStaticRoutes() {
           </div>
           <div className="bg-blue-900 border border-blue-700">
             <div className="px-2 pb-2">
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-1 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1 text-xs">
                 <div className="bg-blue-800 p-1 text-blue-100">
-                  <strong>1. Individual Thought</strong><br />
-                  <span className="hidden sm:inline">Agents think independently</span>
-                  <span className="sm:hidden">Independent thinking</span>
+                  <strong>1. Individual</strong><br />
+                  <span className="hidden xs:inline">Agents think independently</span>
+                  <span className="xs:hidden">Independent thinking</span>
                 </div>
                 <div className="bg-green-800 p-1 text-green-100">
-                  <strong>2. Mutual Reflection</strong><br />
-                  <span className="hidden sm:inline">Agents read and react to others</span>
-                  <span className="sm:hidden">Read & react</span>
+                  <strong>2. Mutual</strong><br />
+                  <span className="hidden xs:inline">Agents read and react</span>
+                  <span className="xs:hidden">Read & react</span>
                 </div>
                 <div className="bg-yellow-800 p-1 text-yellow-100">
-                  <strong>3. Conflict Resolution</strong><br />
-                  <span className="hidden sm:inline">Highlight divergence and debate</span>
-                  <span className="sm:hidden">Resolve conflicts</span>
+                  <strong>3. Conflict</strong><br />
+                  <span className="hidden xs:inline">Highlight divergence</span>
+                  <span className="xs:hidden">Resolve conflicts</span>
                 </div>
                 <div className="bg-purple-800 p-1 text-purple-100">
-                  <strong>4. Synthesis Attempt</strong><br />
-                  <span className="hidden sm:inline">Try to unify perspectives</span>
-                  <span className="sm:hidden">Unify views</span>
+                  <strong>4. Synthesis</strong><br />
+                  <span className="hidden xs:inline">Try to unify views</span>
+                  <span className="xs:hidden">Unify views</span>
                 </div>
-                <div className="bg-indigo-800 p-1 text-indigo-100">
-                  <strong>5. Output Generation</strong><br />
-                  <span className="hidden sm:inline">Final response with reasoning traces</span>
-                  <span className="sm:hidden">Final output</span>
+                <div className="bg-indigo-800 p-1 text-indigo-100 col-span-2 sm:col-span-1">
+                  <strong>5. Output</strong><br />
+                  <span className="hidden xs:inline">Final response</span>
+                  <span className="xs:hidden">Final output</span>
                 </div>
               </div>
             </div>
