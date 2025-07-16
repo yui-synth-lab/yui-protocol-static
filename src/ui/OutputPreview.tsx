@@ -16,12 +16,10 @@ const OutputPreview: React.FC<OutputPreviewProps> = ({ outputFileName, sessionId
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('/yui-protocol-static/data/outputs.json');
-        if (!response.ok) throw new Error('outputs.json not found');
-        const outputsData = await response.json();
-        const key = outputFileName.replace('.md', '');
-        const fileContent = outputsData[key];
-        if (!fileContent) throw new Error('File content not found in outputs.json');
+        // outputs.jsonではなく、個別ファイルをfetch
+        const response = await fetch(`/yui-protocol-static/data/outputs/${outputFileName}`);
+        if (!response.ok) throw new Error('Output file not found');
+        const fileContent = await response.text();
         setContent(fileContent);
       } catch (err: any) {
         setError(err.message || 'Unknown error');
