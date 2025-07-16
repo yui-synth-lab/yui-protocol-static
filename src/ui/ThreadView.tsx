@@ -21,27 +21,18 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
 
   const handleDownloadOutput = async () => {
     if (!session.outputFileName) return;
-    
     try {
-      // outputs.jsonからファイル内容を取得
-      const response = await fetch('/yui-protocol-static/data/outputs.json');
+      // outputs.jsonではなく、個別ファイルをfetch
+      const response = await fetch(`/yui-protocol-static/data/outputs/${session.outputFileName}`);
       if (!response.ok) {
-        throw new Error('outputs.json not found');
+        throw new Error('Output file not found');
       }
-      
-      const outputsData = await response.json();
-      const fileContent = outputsData[session.outputFileName.replace('.md', '')];
-      
-      if (!fileContent) {
-        throw new Error('File content not found in outputs.json');
-      }
-      
+      const fileContent = await response.text();
       // ファイル名から拡張子を取得
       const extension = session.outputFileName.split('.').pop() || 'txt';
       const mimeType = extension === 'md' ? 'text/markdown' : 
                       extension === 'json' ? 'application/json' : 
                       'text/plain';
-      
       // Blobを作成してダウンロード
       const blob = new Blob([fileContent], { type: mimeType });
       const url = window.URL.createObjectURL(blob);

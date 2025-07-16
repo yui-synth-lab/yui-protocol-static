@@ -1,48 +1,52 @@
 import fs from 'fs';
 import path from 'path';
 
-// sessionsディレクトリからJSONファイルを読み込んでマージ
 const sessionsDir = './sessions';
 const outputsDir = './outputs';
 const dataDir = './public/data';
+const dataSessionsDir = path.join(dataDir, 'sessions');
+const dataOutputsDir = path.join(dataDir, 'outputs');
 
-// データディレクトリを作成
+// データディレクトリとサブディレクトリを作成
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
+if (!fs.existsSync(dataSessionsDir)) {
+  fs.mkdirSync(dataSessionsDir, { recursive: true });
+}
+if (!fs.existsSync(dataOutputsDir)) {
+  fs.mkdirSync(dataOutputsDir, { recursive: true });
+}
 
-// sessions.jsonを作成
+// sessions/の各jsonをpublic/data/sessions/{id}.jsonとしてコピー
 const sessionFiles = fs.readdirSync(sessionsDir).filter(file => file.endsWith('.json'));
-const sessions = [];
-
+let sessionCount = 0;
 for (const file of sessionFiles) {
   try {
-    const sessionData = JSON.parse(fs.readFileSync(path.join(sessionsDir, file), 'utf8'));
-    sessions.push(sessionData);
+    const srcPath = path.join(sessionsDir, file);
+    const destPath = path.join(dataSessionsDir, file);
+    fs.copyFileSync(srcPath, destPath);
+    sessionCount++;
   } catch (error) {
-    console.error(`Error reading session file ${file}:`, error);
+    console.error(`Error copying session file ${file}:`, error);
   }
 }
+console.log(`Copied ${sessionCount} session files to ${dataSessionsDir}`);
+// index.jsonを出力
+fs.writeFileSync(path.join(dataSessionsDir, 'index.json'), JSON.stringify(sessionFiles, null, 2));
+console.log(`Created index.json with ${sessionFiles.length} session files`);
 
-// セッションを更新日時でソート（新しい順）
-sessions.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-
-fs.writeFileSync(path.join(dataDir, 'sessions.json'), JSON.stringify(sessions, null, 2));
-console.log(`Created sessions.json with ${sessions.length} sessions`);
-
-// outputs.jsonを作成
+// outputs/の各mdをpublic/data/outputs/{filename}.mdとしてコピー
 const outputFiles = fs.readdirSync(outputsDir).filter(file => file.endsWith('.md'));
-const outputs = {};
-
+let outputCount = 0;
 for (const file of outputFiles) {
   try {
-    const content = fs.readFileSync(path.join(outputsDir, file), 'utf8');
-    const filename = path.basename(file, '.md');
-    outputs[filename] = content;
+    const srcPath = path.join(outputsDir, file);
+    const destPath = path.join(dataOutputsDir, file);
+    fs.copyFileSync(srcPath, destPath);
+    outputCount++;
   } catch (error) {
-    console.error(`Error reading output file ${file}:`, error);
+    console.error(`Error copying output file ${file}:`, error);
   }
 }
-
-fs.writeFileSync(path.join(dataDir, 'outputs.json'), JSON.stringify(outputs, null, 2));
-console.log(`Created outputs.json with ${Object.keys(outputs).length} outputs`); 
+console.log(`Copied ${outputCount} output files to ${dataOutputsDir}`); 

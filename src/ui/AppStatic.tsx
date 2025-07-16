@@ -86,8 +86,18 @@ export function AppStaticRoutes() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const sessionResponse = await fetch('/yui-protocol-static/data/sessions.json');
-        const sessions = await sessionResponse.json();
+        // sessionsディレクトリのindex.jsonからファイル一覧を取得
+        const indexJsonResp = await fetch('/yui-protocol-static/data/sessions/index.json');
+        if (!indexJsonResp.ok) throw new Error('No session index');
+        const fileList: string[] = await indexJsonResp.json();
+        // 各セッションファイルをfetch
+        const sessionPromises = fileList.map(async (file) => {
+          const resp = await fetch(`/yui-protocol-static/data/sessions/${file}`);
+          return resp.json();
+        });
+        const sessions = await Promise.all(sessionPromises);
+        // 日付順ソート
+        sessions.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
         setSessions(sessions);
         // URLパラメータからセッションIDとプレビュー有無を取得
         const urlParams = new URLSearchParams(window.location.search);
