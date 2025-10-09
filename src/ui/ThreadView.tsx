@@ -194,14 +194,14 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
     <div className="flex flex-col w-full max-w-4xl mx-auto bg-gray-950 rounded-lg shadow-lg h-full overflow-hidden">
       {/* スレッドヘッダー */}
       <div className="border-b border-gray-700 bg-gray-900">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div>
-            <h2 className="text-xl font-bold text-gray-100 mb-1">{session.title}</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-3 sm:px-6 py-3 sm:py-4 gap-2">
+          <div className="flex-1">
+            <h2 className="text-base sm:text-xl font-bold text-gray-100 mb-1 break-words">{session.title}</h2>
             <div className="text-xs text-gray-400">
               {session.agents.length} agents • {session.messages.length} messages
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center flex-wrap gap-2">
             {hasDetailedMessages && (
               <button
                 onClick={() => setShowDetailedView(!showDetailedView)}
@@ -219,7 +219,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
               <>
                 <button
                   onClick={handleDownloadOutput}
-                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded border border-blue-500 transition-colors"
+                  className="hidden sm:inline-flex px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded border border-blue-500 transition-colors"
                   title={`Download ${session.outputFileName}`}
                 >
                   📄 Download
@@ -231,7 +231,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
                     url.searchParams.set('preview', '');
                     window.location.href = url.toString();
                   }}
-                  className="px-3 py-1 bg-green-700 hover:bg-green-800 text-white text-xs rounded border border-green-600 transition-colors"
+                  className="hidden sm:inline-flex px-3 py-1 bg-green-700 hover:bg-green-800 text-white text-xs rounded border border-green-600 transition-colors"
                   title="Markdownプレビューを表示"
                 >
                   🖹 Preview
@@ -245,7 +245,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
         </div>
       </div>
       {/* メッセージリスト */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 bg-gray-950">
+      <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6 bg-gray-950">
         {(() => {
           let prevStage: string | undefined = undefined;
           const elements: React.ReactNode[] = [];
@@ -299,14 +299,14 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
             }
 
             // バブルの色や枠線
-            let bubbleClass = `bg-gray-800 p-4 rounded prose prose-invert max-w-none text-sm`;
+            let bubbleClass = `bg-gray-800 p-3 sm:p-4 rounded prose prose-invert max-w-none text-xs sm:text-sm`;
             // アバター背景
-            let avatarClass = `w-10 h-10 rounded-full flex items-center justify-center text-2xl shadow border-2 border-gray-700`;
+            let avatarClass = `w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xl sm:text-2xl shadow border-2 border-gray-700`;
 
             elements.push(
               <div
                 key={message.id}
-                className={`flex items-start space-x-3 ${isUser ? 'flex-row-reverse justify-end' : 'justify-start'}`}
+                className={`flex items-start space-x-2 sm:space-x-3 ${isUser ? 'flex-row-reverse justify-end' : 'justify-start'}`}
               >
                 <div className="flex-shrink-0">
                   <div className={avatarClass} style={avatarBgStyle}>{avatar}</div>

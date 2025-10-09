@@ -131,11 +131,11 @@ export function AppStaticRoutes() {
       <header className="bg-gray-800 border-b border-gray-700">
         <div className="flex flex-col items-center w-full max-w-4xl mx-auto px-2 pt-4 pb-2">
           <div className="flex items-center w-full justify-between">
-            <div className="flex items-center space-x-4">
-              <img src={imgUrl} alt="Yui Protocol" className="h-10 w-auto rounded shadow" />
-              <h1 className="text-2xl font-bold tracking-tight">Yui Protocol</h1>
-              <span className="text-xs bg-yellow-600 text-yellow-100 px-2 py-1 rounded">Static Demo</span>
-              <a href="https://github.com/yui-synth-lab/yui-protocol" target="_blank" rel="noopener noreferrer"><img src={githubIcon} alt="GitHub" className="h-6 w-auto" /></a>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <img src={imgUrl} alt="Yui Protocol" className="h-8 sm:h-10 w-auto rounded shadow" />
+              <h1 className="text-lg sm:text-2xl font-bold tracking-tight">Yui Protocol</h1>
+              <span className="text-xs bg-yellow-600 text-yellow-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">Static Demo</span>
+              <a href="https://github.com/yui-synth-lab/yui-protocol" target="_blank" rel="noopener noreferrer" className="hidden sm:inline"><img src={githubIcon} alt="GitHub" className="h-6 w-auto" /></a>
             </div>
             <button
               onClick={() => setIsMenuOpen(true)}
@@ -149,33 +149,23 @@ export function AppStaticRoutes() {
           <div className="w-full text-center text-xs text-gray-400 mt-1 mb-2">
             Multi-AI Collaborative Reasoning through Structured Dialogue
           </div>
-          <div className="bg-blue-900 border border-blue-700">
+          <div className="bg-blue-900 border border-blue-700 w-full">
             <div className="px-2 pb-2">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1 text-xs">
-                <div className="bg-blue-800 p-1 text-blue-100">
-                  <strong>1. Individual</strong><br />
-                  <span className="hidden xs:inline">Agents think independently</span>
-                  <span className="xs:hidden">Independent thinking</span>
+              <div className="flex flex-col sm:grid sm:grid-cols-3 md:grid-cols-5 gap-1 text-xs">
+                <div className="bg-blue-800 p-2 text-blue-100 rounded">
+                  <strong>1. Individual Thought</strong>
                 </div>
-                <div className="bg-green-800 p-1 text-green-100">
-                  <strong>2. Mutual</strong><br />
-                  <span className="hidden xs:inline">Agents read and react</span>
-                  <span className="xs:hidden">Read & react</span>
+                <div className="bg-green-800 p-2 text-green-100 rounded">
+                  <strong>2. Mutual Reflection</strong>
                 </div>
-                <div className="bg-yellow-800 p-1 text-yellow-100">
-                  <strong>3. Conflict</strong><br />
-                  <span className="hidden xs:inline">Highlight divergence</span>
-                  <span className="xs:hidden">Resolve conflicts</span>
+                <div className="bg-yellow-800 p-2 text-yellow-100 rounded">
+                  <strong>3. Conflict Resolution</strong>
                 </div>
-                <div className="bg-purple-800 p-1 text-purple-100">
-                  <strong>4. Synthesis</strong><br />
-                  <span className="hidden xs:inline">Try to unify views</span>
-                  <span className="xs:hidden">Unify views</span>
+                <div className="bg-purple-800 p-2 text-purple-100 rounded">
+                  <strong>4. Synthesis Attempt</strong>
                 </div>
-                <div className="bg-indigo-800 p-1 text-indigo-100 col-span-2 sm:col-span-1">
-                  <strong>5. Output</strong><br />
-                  <span className="hidden xs:inline">Final response</span>
-                  <span className="xs:hidden">Final output</span>
+                <div className="bg-indigo-800 p-2 text-indigo-100 rounded">
+                  <strong>5. Output Generation</strong>
                 </div>
               </div>
             </div>
