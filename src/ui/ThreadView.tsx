@@ -9,9 +9,42 @@ interface ThreadViewProps {
 }
 
 const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isReadOnly = false }) => {
+  const [showAgentDetails, setShowAgentDetails] = React.useState(false);
+  const [showDetailedView, setShowDetailedView] = React.useState(false); // デフォルトで非表示（通常表示）
+
   const getAgentById = (agentId: string): Agent | undefined => {
     return session.agents.find(agent => agent.id === agentId);
   };
+
+  // 登録されているエージェントのIDセット
+  const registeredAgentIds = React.useMemo(() => {
+    return new Set(session.agents.map(agent => agent.id));
+  }, [session.agents]);
+
+  // Check if there are non-agent messages in the session
+  const hasDetailedMessages = React.useMemo(() => {
+    return session.messages.some(msg => {
+      // userメッセージは除外して判定
+      if (msg.role === 'user') return false;
+      // agentIdが登録されていないメッセージがあるか
+      return !msg.agentId || !registeredAgentIds.has(msg.agentId);
+    });
+  }, [session.messages, registeredAgentIds]);
+
+  // Filter messages based on view mode
+  const filteredMessages = React.useMemo(() => {
+    if (showDetailedView) {
+      // 詳細表示：全てのメッセージを表示
+      return session.messages;
+    }
+    // 通常表示：agentsに登録されているエージェントとユーザーメッセージのみ表示
+    return session.messages.filter(msg => {
+      // ユーザーメッセージは常に表示
+      if (msg.role === 'user') return true;
+      // agentIdが登録されているエージェントのみ表示
+      return msg.agentId && registeredAgentIds.has(msg.agentId);
+    });
+  }, [session.messages, showDetailedView, registeredAgentIds]);
 
   const formatTimestamp = (timestamp: string): string => {
     return new Date(timestamp).toLocaleString();
@@ -61,7 +94,10 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
       'conflict-resolution': 'bg-yellow-900 border border-yellow-700',
       'synthesis-attempt': 'bg-purple-900 border border-purple-700',
       'output-generation': 'bg-indigo-900 border border-indigo-700',
-      'finalize': 'bg-gray-800 border border-gray-600'
+      'finalize': 'bg-teal-800 border border-teal-600',
+      'facilitator': 'bg-yellow-800 border border-yellow-600',
+      'deep-dive': 'bg-cyan-900 border border-cyan-700',
+      'perspective-shift': 'bg-pink-900 border border-pink-700'
     };
     return colors[stage] || 'bg-gray-800 border border-gray-600';
   };
@@ -73,7 +109,10 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
       'conflict-resolution': 'Conflict Resolution',
       'synthesis-attempt': 'Synthesis Attempt',
       'output-generation': 'Output Generation',
-      'finalize': 'Finalize'
+      'finalize': 'Finalize',
+      'facilitator': 'Facilitator Judgment',
+      'deep-dive': 'Deep Dive',
+      'perspective-shift': 'Perspective Shift'
     };
     return labels[stage] || stage;
   };
@@ -154,39 +193,54 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto bg-gray-950 rounded-lg shadow-lg h-full overflow-hidden">
       {/* スレッドヘッダー */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700 bg-gray-900">
-        <div>
-          <h2 className="text-xl font-bold text-gray-100 mb-1">{session.title}</h2>
-          <div className="text-xs text-gray-400">
-            {session.agents.length} agents • {session.messages.length} messages
+      <div className="border-b border-gray-700 bg-gray-900">
+        <div className="flex items-center justify-between px-6 py-4">
+          <div>
+            <h2 className="text-xl font-bold text-gray-100 mb-1">{session.title}</h2>
+            <div className="text-xs text-gray-400">
+              {session.agents.length} agents • {session.messages.length} messages
+            </div>
           </div>
-        </div>
-        <div className="flex items-center space-x-4">
-          {session.outputFileName && (
-            <>
+          <div className="flex items-center space-x-2">
+            {hasDetailedMessages && (
               <button
-                onClick={handleDownloadOutput}
-                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded border border-blue-500 transition-colors"
-                title={`Download ${session.outputFileName}`}
+                onClick={() => setShowDetailedView(!showDetailedView)}
+                className={`px-3 py-1 text-white text-xs rounded border transition-colors ${
+                  showDetailedView
+                    ? 'bg-purple-700 hover:bg-purple-600 border-purple-600'
+                    : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
+                }`}
+                title={showDetailedView ? '通常表示に戻す' : '詳細表示（全メッセージ）'}
               >
-                📄 Download Output
+                {showDetailedView ? '📝 Normal View' : '🔍 Detailed View'}
               </button>
-              <button
-                onClick={() => {
-                  const url = new URL(window.location.href);
-                  url.searchParams.set('session', session.id);
-                  url.searchParams.set('preview', '');
-                  window.location.href = url.toString();
-                }}
-                className="px-3 py-1 bg-green-700 hover:bg-green-800 text-white text-xs rounded border border-green-600 transition-colors"
-                title="Markdownプレビューを表示"
-              >
-                🖹 Preview
-              </button>
-            </>
-          )}
-          <div className="text-xs text-gray-500">
-            Created: {formatTimestamp(session.createdAt)}
+            )}
+            {session.outputFileName && (
+              <>
+                <button
+                  onClick={handleDownloadOutput}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded border border-blue-500 transition-colors"
+                  title={`Download ${session.outputFileName}`}
+                >
+                  📄 Download
+                </button>
+                <button
+                  onClick={() => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('session', session.id);
+                    url.searchParams.set('preview', '');
+                    window.location.href = url.toString();
+                  }}
+                  className="px-3 py-1 bg-green-700 hover:bg-green-800 text-white text-xs rounded border border-green-600 transition-colors"
+                  title="Markdownプレビューを表示"
+                >
+                  🖹 Preview
+                </button>
+              </>
+            )}
+            <div className="text-xs text-gray-500">
+              {formatTimestamp(session.createdAt)}
+            </div>
           </div>
         </div>
       </div>
@@ -195,9 +249,10 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
         {(() => {
           let prevStage: string | undefined = undefined;
           const elements: React.ReactNode[] = [];
-          session.messages.forEach((message: Message, idx: number) => {
+          filteredMessages.forEach((message: Message, idx: number) => {
             const currentStage = message.stage;
 
+            // ステージセパレーターを表示
             if (currentStage && currentStage !== prevStage) {
               elements.push(
                 <div key={`stage-separator-${idx}`} className="my-4">
@@ -212,10 +267,17 @@ const ThreadView: React.FC<ThreadViewProps> = ({ session, onSessionUpdate, isRea
             const agent = message.agentId ? getAgentById(message.agentId) : undefined;
             const isUser = message.role === 'user';
             const isSystem = message.role === 'system';
+            const isConsensus = message.role === 'consensus';
 
             // originaluiの色ロジック
             let avatar, name, nameStyle, bubbleBorderStyle, avatarBgStyle;
-            if (isSystem) {
+            if (isConsensus) {
+              avatar = <span className="text-sm">🤝</span>;
+              name = 'Facilitator';
+              nameStyle = { color: '#fbbf24' };
+              bubbleBorderStyle = { borderLeft: '4px solid #fbbf24' };
+              avatarBgStyle = { backgroundColor: '#fbbf24' };
+            } else if (isSystem) {
               avatar = <span className="text-sm">⚙️</span>;
               name = 'System';
               nameStyle = { color: '#a78bfa' };
