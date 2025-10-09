@@ -29,4 +29,4 @@ YUI Protocolの静的デモンストレーションサイトです。GitHub Page
 
 ## ライセンス
 
-このプロジェクトはMITライセンスの下で公開されています。 
+このプロジェクトは[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)ライセンスの下で公開されています。 
