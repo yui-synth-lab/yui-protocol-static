@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "sync": "node scripts/sync-from-yui-protocol.js",
     "build:static": "node scripts/build-static-data.js && vite build --config vite.config.static.ts",
     "preview": "vite preview",
     "preview:static": "vite preview --config vite.config.static.ts",
